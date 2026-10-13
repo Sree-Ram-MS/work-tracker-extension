@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Daily Work Tracker — Dashboard</title>
+<link rel="stylesheet" href="dashboard.css" />
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="logo">
+      <img src="../icons/hot-32.png" alt="" />
+      <span>Work Tracker</span>
+    </div>
+    <nav class="tabs">
+      <button class="tab active" data-tab="entries">📋 Entries</button>
+      <button class="tab" data-tab="projects">🗂 Project Master</button>
+      <button class="tab" data-tab="sheets">📊 Google Sheets</button>
+      <button class="tab" data-tab="data">⇄ Import / Export</button>
+    </nav>
+    <div class="sidebar-legend">
+      <p class="legend-title">Status legend</p>
+      <div class="legend-row"><img src="../icons/freeze-16.png" /> No entry — Freeze</div>
+      <div class="legend-row"><img src="../icons/advance-16.png" /> To Do — pending</div>
+      <div class="legend-row"><img src="../icons/progress-16.png" /> In progress — something else in mind</div>
+      <div class="legend-row"><img src="../icons/hot-16.png" /> Completed — Hot</div>
+    </div>
+  </aside>
+
+  <main class="content">
+
+    <!-- ENTRIES TAB -->
+    <section id="tab-entries" class="tab-panel active">
+      <div class="panel-head">
+        <h1>Work Entries</h1>
+        <button id="newEntryBtn" class="primary-btn">+ New entry</button>
+      </div>
+
+      <div class="progress-card">
+        <div class="progress-head">
+          <span>Today's hours</span>
+          <span id="dashProgressText">0 / 8h</span>
+        </div>
+        <div class="progress-track">
+          <div id="dashProgressFill" class="progress-fill" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="filters">
+        <label>From <input type="date" id="filterFrom" /></label>
+        <label>To <input type="date" id="filterTo" /></label>
+        <label>Project
+          <select id="filterProject"><option value="">All projects</option></select>
+        </label>
+        <label>Status
+          <select id="filterStatus">
+            <option value="">All statuses</option>
+            <option value="todo">To Do</option>
+            <option value="inprogress">In Progress</option>
+            <option value="completed">Completed</option>
+          </select>
+        </label>
+        <button id="clearFilters" class="link-btn">Clear</button>
+        <div class="summary-chip" id="filterSummary"></div>
+      </div>
+
+      <div class="table-wrap">
+        <table id="entriesTable">
+          <thead>
+            <tr>
+              <th>Date</th><th>Project</th><th>Task</th><th>Time</th><th>Status</th><th>Sheet</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="entriesBody"></tbody>
+        </table>
+        <p id="entriesEmpty" class="muted empty-state">No entries match these filters yet.</p>
+      </div>
+    </section>
+
+    <!-- PROJECTS TAB -->
+    <section id="tab-projects" class="tab-panel">
+      <div class="panel-head">
+        <h1>Project Master</h1>
+      </div>
+      <form id="projectForm" class="inline-form">
+        <input type="text" id="newProjectName" placeholder="New project name" required />
+        <input type="color" id="newProjectColor" value="#6c63ff" title="Project color" />
+        <button type="submit" class="primary-btn">Add project</button>
+      </form>
+      <div class="table-wrap">
+        <table id="projectsTable">
+          <thead><tr><th></th><th>Name</th><th>Active</th><th>Entries</th><th></th></tr></thead>
+          <tbody id="projectsBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- IMPORT / EXPORT TAB -->
+    <section id="tab-data" class="tab-panel">
+      <div class="panel-head"><h1>Import / Export</h1></div>
+
+      <div class="card">
+        <h2>Export</h2>
+        <p class="muted">Download everything — projects, entries and settings (password excluded) — as a file.</p>
+        <div class="btn-row">
+          <button id="exportJson" class="secondary-btn">Export as JSON</button>
+          <button id="exportCsv" class="secondary-btn">Export entries as CSV</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Import</h2>
+        <p class="muted">Import a previously exported JSON file. Choose whether to merge with existing data or replace it entirely.</p>
+        <input type="file" id="importFile" accept="application/json" />
+        <div class="radio-row">
+          <label><input type="radio" name="importMode" value="merge" checked /> Merge (keep existing, add new)</label>
+          <label><input type="radio" name="importMode" value="replace" /> Replace (overwrite everything)</label>
+        </div>
+        <button id="importBtn" class="primary-btn" disabled>Import file</button>
+        <p id="importStatus" class="muted"></p>
+      </div>
+    </section>
+
+    <!-- GOOGLE SHEETS TAB -->
+    <section id="tab-sheets" class="tab-panel">
+      <div class="panel-head">
+        <h1>Google Sheets Integration</h1>
+      </div>
+
+      <div class="card notice">
+        Automatically or manually sync your daily work entries into your Google Sheet (e.g. <b>Time_Tracking</b>).
+        Setup uses Google Apps Script Web App — <b>no Google Cloud Console or complex API keys needed!</b>
+      </div>
+
+      <div class="card">
+        <h2>Connection Settings</h2>
+        <form id="gsSettingsForm" class="settings-form">
+          <label class="checkbox-row">
+            <input type="checkbox" id="sGsEnabled" /> Enable Google Sheets sync
+          </label>
+
+          <label>Google Apps Script Web App URL
+            <input type="text" id="sGsWebhookUrl" placeholder="https://script.google.com/macros/s/AKfycb.../exec" />
+          </label>
+
+          <div class="grid2">
+            <label>Sheet Tab Name
+              <input type="text" id="sGsSheetName" placeholder="Time_Tracking" value="Time_Tracking" />
+            </label>
+            <label class="checkbox-row" style="align-self:end;">
+              <input type="checkbox" id="sGsAutoSync" checked /> Auto-sync when adding new entries
+            </label>
+          </div>
+
+          <div class="btn-row">
+            <button type="submit" class="primary-btn">Save Settings</button>
+            <button type="button" id="testGsBtn" class="secondary-btn">Test Connection</button>
+          </div>
+          <p id="gsConnectionStatus" class="muted"></p>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>Manual Sync Actions</h2>
+        <p class="muted">Push existing entries to your Google Sheet on demand.</p>
+        <div class="btn-row">
+          <button type="button" id="syncTodayGsBtn" class="secondary-btn">Sync Today's Entries</button>
+          <button type="button" id="syncAllGsBtn" class="secondary-btn">Sync All Pending Entries</button>
+        </div>
+        <p id="gsSyncStatus" class="muted" style="margin-top:10px;"></p>
+      </div>
+
+      <div class="card">
+        <h2>3-Minute Setup Instructions</h2>
+        <ol class="setup-steps">
+          <li>Open your Google Sheet (e.g. <b>Time_Tracking</b>) in your browser.</li>
+          <li>Click <b>Extensions &gt; Apps Script</b> in the top menu of your Google Sheet.</li>
+          <li>Delete any existing code in the editor, click the button below to copy the script, and paste it into Apps Script:
+            <div style="margin: 10px 0;">
+              <button type="button" id="copyGsCodeBtn" class="primary-btn" style="background:#22c55e;">📋 Copy Apps Script Code</button>
+              <span id="copyGsCodeFeedback" class="muted" style="margin-left:8px;"></span>
+            </div>
+          </li>
+          <li>Click the blue <b>Deploy</b> button (top right) &gt; <b>New deployment</b>.</li>
+          <li>Click the gear icon next to <i>Select type</i> &gt; choose <b>Web app</b>.</li>
+          <li>Set <b>Execute as</b>: <code>Me</code> and <b>Who has access</b>: <code>Anyone</code>.</li>
+          <li>Click <b>Deploy</b>, authorize permissions when prompted by Google, and copy the <b>Web app URL</b>.</li>
+          <li>Paste the URL into <b>Google Apps Script Web App URL</b> above and click <b>Test Connection</b>!</li>
+        </ol>
+        <details style="margin-top:14px;">
+          <summary style="cursor:pointer; color:var(--accent); font-weight:600;">View Apps Script Code</summary>
+          <pre id="gsCodeBlock" style="background:var(--surface-2); padding:12px; border-radius:8px; overflow-x:auto; font-size:12px; border:1px solid var(--border); margin-top:8px; user-select:all;"></pre>
+        </details>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Entry edit dialog -->
+<dialog id="entryDialog">
+  <form id="entryForm" method="dialog" class="entry-dialog-form">
+    <h2 id="entryDialogTitle">New entry</h2>
+    <input type="hidden" id="eId" />
+    <label>Date <input type="date" id="eDate" required /></label>
+    <label>Project
+      <select id="eProject" required></select>
+    </label>
+    <label>Task <input type="text" id="eTask" required /></label>
+    <label>Hours <input type="number" id="eHours" min="0" max="24" step="0.25" placeholder="e.g. 2.5 = 2h 30m" required /></label>
+    <label>Status
+      <select id="eStatus">
+        <option value="todo">To Do</option>
+        <option value="inprogress">In Progress</option>
+        <option value="completed">Completed</option>
+      </select>
+    </label>
+    <label>Notes <textarea id="eNotes" rows="2"></textarea></label>
+    <div class="btn-row">
+      <button type="button" id="eCancel" class="secondary-btn">Cancel</button>
+      <button type="submit" id="eSave" class="primary-btn">Save entry</button>
+    </div>
+  </form>
+</dialog>
+
+<script type="module" src="dashboard.js"></script>
+</body>
+</html>
