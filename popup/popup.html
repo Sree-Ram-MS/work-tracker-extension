@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Daily Work Tracker</title>
+<link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div class="brand">
+        <img id="statusGlyph" src="../icons/freeze-32.png" alt="status" />
+        <div>
+          <h1>Work Tracker</h1>
+          <p id="statusLabel" class="status-label">No entry yet today</p>
+        </div>
+      </div>
+      <button id="openDashboard" class="icon-btn" title="Open full dashboard">⤢</button>
+    </header>
+
+    <div class="progress-section">
+      <div class="progress-head">
+        <span>Today's hours</span>
+        <span id="progressText">0 / 8h</span>
+      </div>
+      <div class="progress-track">
+        <div id="progressFill" class="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <form id="quickForm" class="quick-form">
+      <div class="row">
+        <label>Date
+          <input type="date" id="fDate" required />
+        </label>
+        <label>Hours
+          <input type="number" id="fHours" min="0" max="24" step="0.25" placeholder="e.g. 2.5" required />
+        </label>
+      </div>
+
+      <label>Project
+        <select id="fProject" required></select>
+      </label>
+
+      <label>Task
+        <input type="text" id="fTask" placeholder="What did you work on?" required />
+      </label>
+
+      <label>Status
+        <div class="status-pills" id="fStatusPills">
+          <button type="button" class="pill" data-status="todo">To Do</button>
+          <button type="button" class="pill" data-status="inprogress">In Progress</button>
+          <button type="button" class="pill" data-status="completed">Completed</button>
+        </div>
+      </label>
+
+      <button type="submit" class="primary-btn">Add entry</button>
+      <div id="quickSyncToast" class="sync-toast" style="display:none;"></div>
+    </form>
+
+    <div class="today-section">
+      <div class="today-head">
+        <div class="nav-row">
+          <button id="prevDay" class="nav-btn" title="Previous day">&#8592;</button>
+          <h2 id="dayLabel">Today</h2>
+          <button id="nextDay" class="nav-btn" title="Next day">&#8594;</button>
+        </div>
+        <span id="todayTotal" class="muted"></span>
+      </div>
+      <ul id="todayList" class="entry-list"></ul>
+      <p id="emptyState" class="muted empty-state">Nothing logged yet.</p>
+    </div>
+
+    <footer class="app-footer">
+      <button id="syncToSheetQuick" class="link-btn" title="Sync today's entries to Google Sheet">📊 Sync to Sheet</button>
+      <button id="openSheets" class="link-btn">Sheet setup</button>
+      <button id="exportQuick" class="link-btn">Export</button>
+      <button id="openProjects" class="link-btn">Projects</button>
+    </footer>
+  </div>
+  <script type="module" src="popup.js"></script>
+</body>
+</html>
